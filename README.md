@@ -80,15 +80,7 @@ Example RTAB-Map launch files are located at:
 To start mapping with your D455:
 
 ```bash
-ros2 launch rtabmap_launch rtabmap.launch.py \
-rgb_topic:=/camera/camera/color/image_raw \
-depth_topic:=/camera/camera/depth/image_rect_raw \
-camera_info_topic:=/camera/camera/color/camera_info \
-frame_id:=camera_link \
-odom_frame_id:=odom \
-map_frame_id:=map \
-approx_sync:=true \
-qos:=1
+ros2 launch rtabmap_launch rtabmap.launch.py rgb_topic:=/camera/camera/color/image_raw depth_topic:=/camera/camera/depth/image_rect_raw camera_info_topic:=/camera/camera/color/camera_info frame_id:=camera_link odom_frame_id:=odom map_frame_id:=map approx_sync:=true qos:=1
 ```
 
 🔀 If using **stereo mapping**, change the topics to use `/infra1` and `/infra2`.
