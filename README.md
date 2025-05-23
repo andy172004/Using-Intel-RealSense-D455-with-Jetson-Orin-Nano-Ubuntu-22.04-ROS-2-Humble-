@@ -108,6 +108,90 @@ ros2 run rviz2 rviz2
 * Set `Fixed Frame` to: `map`
 
 ---
+📊 Working with Point Cloud in Python using Open3D
+
+
+
+Once you export your point cloud (e.g., as a .pcd or .ply file), you can use the following script to visualize it with Open3D:
+
+Install Open3D (if not already installed):
+
+pip install open3d
+
+Basic Visualization:
+
+import open3d as o3d
+
+# Load your PCD or PLY file
+pcd = o3d.io.read_point_cloud("map.pcd")  # or "map.ply"
+
+# Visualize
+o3d.visualization.draw_geometries([pcd])
+
+🔍 Example: Floor Plane Detection and Waypoint Extraction
+
+import open3d as o3d
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+
+# Step 1: Load Point Cloud
+pcd = o3d.io.read_point_cloud("cloud4.ply")
+
+# Step 2: Downsample and estimate normals
+pcd_down = pcd.voxel_down_sample(voxel_size=0.02)
+pcd_down.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
+
+# Step 3: Plane Segmentation (find floor)
+plane_model, inliers = pcd_down.segment_plane(distance_threshold=0.02, ransac_n=3, num_iterations=1000)
+[a, b, c, d] = plane_model
+print(f"[INFO] Floor plane: {a:.2f}x + {b:.2f}y + {c:.2f}z + {d:.2f} = 0")
+
+# Step 4: Extract floor and non-floor
+floor_cloud = pcd_down.select_by_index(inliers)
+non_floor = pcd_down.select_by_index(inliers, invert=True)
+
+# Step 5: Project floor points to 2D using PCA
+points = np.asarray(floor_cloud.points)
+pca = PCA(n_components=3)
+pca.fit(points)
+points_pca = pca.transform(points)
+xy = points_pca[:, :2]
+
+# Step 6: Bin along x-axis and extract waypoints
+x_vals = xy[:, 0]
+x_bins = np.linspace(np.min(x_vals), np.max(x_vals), num=30)
+waypoints = []
+for i in range(len(x_bins) - 1):
+    bin_mask = (x_vals >= x_bins[i]) & (x_vals < x_bins[i + 1])
+    bin_pts = xy[bin_mask]
+    if len(bin_pts) > 5:
+        mean_point = np.mean(bin_pts, axis=0)
+        waypoints.append(mean_point)
+waypoints = np.array(waypoints)
+
+# Step 7: Inverse transform to 3D
+waypoints_3D = pca.inverse_transform(np.hstack([waypoints, np.zeros((len(waypoints), 1))]))
+
+# Step 8: Visualize
+waypoint_pcd = o3d.geometry.PointCloud()
+waypoint_pcd.points = o3d.utility.Vector3dVector(waypoints_3D)
+waypoint_pcd.paint_uniform_color([1, 0, 0])  # Red
+floor_cloud.paint_uniform_color([0.1, 0.8, 0.1])  # Green
+non_floor.paint_uniform_color([0.3, 0.3, 0.3])  # Grey
+
+o3d.visualization.draw_geometries([floor_cloud, non_floor, waypoint_pcd],
+                                  window_name="Floor + Waypoints")
+
+# Visualize only floor
+o3d.visualization.draw_geometries([floor_cloud],
+                                  window_name="Only Floor")
+
+# Save waypoints
+np.savetxt("waypoints.csv", waypoints_3D, delimiter=",", header="x,y,z", comments='')
+print("[DONE] Waypoints saved to waypoints.csv")
+
+
 
 ## 🔗 References
 
