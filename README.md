@@ -209,7 +209,7 @@ o3d.visualization.draw_geometries([floor_cloud],
 np.savetxt("waypoints.csv", waypoints_3D, delimiter=",", header="x,y,z", comments='')
 print("[DONE] Waypoints saved to waypoints.csv")
 ```
-![Floor Plane Segmentation Using Open3D](floor plane .jpg)
+![Floor Plane Segmentation Using Open3D](floor.jpg)
 
 ## 🔗 References
 
