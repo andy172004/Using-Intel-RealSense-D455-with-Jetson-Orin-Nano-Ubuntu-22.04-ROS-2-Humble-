@@ -44,6 +44,8 @@ ros2 launch realsense2_camera rs_launch.py
 ros2 run rqt_image_view rqt_image_view
 ```
 
+![Rqt Image Viewer](cameratest.jpg)
+
 Choose one of the topics such as:
 
 * `/camera/infra1/image_rect_raw`
@@ -92,6 +94,9 @@ ros2 launch rtabmap_launch rtabmap.launch.py rgb_topic:=/camera/camera/color/ima
 * Export the point cloud from the "File" menu, or view it from the "View" tab.
 
 ---
+
+![Realtime Mapping with RTABMAP](rtabmap.jpg)
+![Visualize the Map in Rtabmap](cloud.jpg)
 
 ## 🛈 Visualize Map in RViz2
 
@@ -204,7 +209,7 @@ o3d.visualization.draw_geometries([floor_cloud],
 np.savetxt("waypoints.csv", waypoints_3D, delimiter=",", header="x,y,z", comments='')
 print("[DONE] Waypoints saved to waypoints.csv")
 ```
-
+![Floor Plane Segmentation Using Open3D](floor plane .jpg)
 
 ## 🔗 References
 
